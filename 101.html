@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organização de Objetos – Profª Adriana</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --azul: #3B82F6;
+            --azul-light: #DBEAFE;
+            --amarelo: #FBBF24;
+            --amarelo-light: #FEF3C7;
+            --rosa: #EC4899;
+            --rosa-light: #FCE7F3;
+            --verde: #22C55E;
+            --verde-dark: #15803D;
+            --bg: #F0FDF4;
+            --card: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.10);
+            --radius: 20px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(circle at 15% 15%, #d1fae5 0%, transparent 40%),
+                              radial-gradient(circle at 85% 80%, #fce7f3 0%, transparent 40%),
+                              radial-gradient(circle at 80% 10%, #dbeafe 0%, transparent 35%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: linear-gradient(135deg, var(--verde-dark) 0%, #16a34a 100%);
+            color: white;
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            box-shadow: 0 4px 16px rgba(21,128,61,0.3);
+        }
+
+        header .title-block h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        header .title-block p { display: none; }
+
+        .score-badge {
+            background: rgba(255,255,255,0.18);
+            border: 2px solid rgba(255,255,255,0.35);
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        /* ── LAYOUT PRINCIPAL ── */
+        main {
+            flex: 1;
+            display: flex;
+            gap: 16px;
+            padding: 14px 20px 10px;
+            min-height: 0;
+        }
+
+        /* ── TABELA ── */
+        .tabela-container {
+            flex: 2.2;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 3px solid #bbf7d0;
+            padding: 16px 18px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .tabela-titulo {
+            font-family: 'Fredoka One', cursive;
+            color: var(--verde-dark);
+            font-size: 1.05rem;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        table {
+            width: 100%;
+            flex: 1;
+            border-collapse: separate;
+            border-spacing: 8px;
+        }
+
+        th {
+            font-family: 'Fredoka One', cursive;
+            font-size: 0.9rem;
+            padding: 8px 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #374151;
+        }
+
+        th:nth-child(2) { color: #6B7280; }
+        th:nth-child(3) { color: #4B5563; }
+        th:nth-child(4) { color: #1F2937; }
+
+        .row-label {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1rem;
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
+
+        .row-label.azul { background: var(--azul-light); color: var(--azul); }
+        .row-label.amarelo { background: var(--amarelo-light); color: #B45309; }
+        .row-label.rosa { background: var(--rosa-light); color: var(--rosa); }
+
+        /* ── SLOT ── */
+        .slot {
+            border-radius: 16px;
+            border: 3px dashed #D1D5DB;
+            background: #F9FAFB;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            min-height: 80px;
+            height: 10vh;
+            vertical-align: middle;
+        }
+
+        .slot-inner {
+            width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 80px; height: 10vh;
+        }
+
+        .slot.azul-slot { border-color: #93C5FD; background: #EFF6FF; }
+        .slot.amarelo-slot { border-color: #FCD34D; background: #FFFBEB; }
+        .slot.rosa-slot { border-color: #F9A8D4; background: #FDF2F8; }
+
+        .slot.drag-over {
+            border-style: solid;
+            transform: scale(1.04);
+        }
+        .slot.azul-slot.drag-over { border-color: var(--azul); background: #DBEAFE; }
+        .slot.amarelo-slot.drag-over { border-color: var(--amarelo); background: #FEF3C7; }
+        .slot.rosa-slot.drag-over { border-color: var(--rosa); background: #FCE7F3; }
+
+        .slot.correto { border-style: solid; border-color: var(--verde) !important; background: #f0fdf4 !important; }
+        .slot.errado { border-style: solid; border-color: #EF4444 !important; background: #FEF2F2 !important; }
+
+        /* ── BANCO ── */
+        .banco-container {
+            flex: 1;
+            background: var(--card);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 3px solid #bbf7d0;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .banco-titulo {
+            font-family: 'Fredoka One', cursive;
+            color: var(--verde-dark);
+            font-size: 1rem;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        #banco {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            overflow-y: auto;
+            align-content: start;
+            padding: 4px;
+        }
+
+        #banco:empty::after {
+            content: "🎉 Todos os itens foram colocados!";
+            font-size: 0.85rem;
+            color: #9CA3AF;
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 20px 0;
+            font-weight: 700;
+        }
+
+        /* ── ITEM ── */
+        .item {
+            cursor: grab;
+            border-radius: 14px;
+            background: #fff;
+            border: 2px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1/1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+            user-select: none;
+            -webkit-user-drag: element;
+            position: relative;
+        }
+
+        .item:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .item:active { cursor: grabbing; }
+        .item.dragging { opacity: 0.4; transform: scale(0.95); }
+
+        .item span { pointer-events: none; line-height: 1; display: block; }
+        .p span { font-size: 1.5rem; }
+        .m span { font-size: 2.8rem; }
+        .g span { font-size: 4.2rem; }
+
+        /* tam-tag removida */
+
+        /* Item dentro do slot */
+        .slot .item {
+            width: 90%; height: 90%;
+            aspect-ratio: unset;
+            cursor: grab;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .slot .item.p span { font-size: 1.4rem; }
+        .slot .item.m span { font-size: 2.6rem; }
+        .slot .item.g span { font-size: 4rem; }
+
+        /* ── BOTÃO CONFERIR ── */
+        .btn-conferir {
+            background: linear-gradient(135deg, var(--verde-dark), #16a34a);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 12px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.05rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 #14532d;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+        .btn-conferir:hover { transform: translateY(-2px); box-shadow: 0 6px 0 #14532d; }
+        .btn-conferir:active { transform: translateY(2px); box-shadow: 0 2px 0 #14532d; }
+
+        /* ── MODAL ── */
+        #modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(4px);
+            display: none; justify-content: center; align-items: center; z-index: 200;
+        }
+        #modal-overlay.show { display: flex; }
+
+        .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 32px 28px 24px;
+            width: 92%;
+            max-width: 460px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+            animation: pop 0.45s cubic-bezier(0.175,0.885,0.32,1.275);
+            text-align: center;
+        }
+
+        @keyframes pop {
+            from { transform: scale(0.4) rotate(-8deg); opacity: 0; }
+            to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+        }
+
+        .modal-emoji { font-size: 4.5rem; line-height: 1; margin-bottom: 8px; animation: bounce 0.7s ease 0.3s both; }
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+
+        .modal-nota {
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.4rem;
+            margin-bottom: 4px;
+        }
+
+        .modal-subtitulo {
+            color: #6B7280;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .relatorio-caixa {
+            background: #F9FAFB;
+            border: 2px solid #E5E7EB;
+            border-radius: 14px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .relatorio-item {
+            padding: 7px 8px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .relatorio-item.ok { background: #F0FDF4; color: #15803D; }
+        .relatorio-item.err { background: #FEF2F2; color: #DC2626; }
+
+        .btn-jogar-novamente {
+            background: linear-gradient(135deg, var(--verde-dark), #16a34a);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 14px;
+            width: 100%;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 #14532d;
+            transition: transform 0.1s, box-shadow 0.1s;
+            text-transform: uppercase;
+        }
+        .btn-jogar-novamente:hover { transform: translateY(-2px); }
+        .btn-jogar-novamente:active { transform: translateY(2px); box-shadow: 0 2px 0 #14532d; }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #e8f5e9;
+            color: #6B7280;
+            text-align: center;
+            padding: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-top: 2px solid #bbf7d0;
+        }
+
+        /* Scrollbar bonita */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="title-block">
+        <h1>🎨 Organização de Objetos</h1>
+        <p>Profª Adriana Bett Terebinto</p>
+    </div>
+    <div class="score-badge" id="score-badge">⭐ 0 / 9</div>
+</header>
+
+<main>
+    <!-- TABELA -->
+    <div class="tabela-container">
+        <p class="tabela-titulo">🖱️ Arraste o item para o lugar certo!</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Cor / Tamanho</th>
+                    <th>🔹 Pequeno</th>
+                    <th>🔶 Médio</th>
+                    <th>🔴 Grande</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><div class="row-label azul">🔵 Azul</div></td>
+                    <td class="slot azul-slot" data-cor="AZUL" data-tam="p"><div class="slot-inner"></div></td>
+                    <td class="slot azul-slot" data-cor="AZUL" data-tam="m"><div class="slot-inner"></div></td>
+                    <td class="slot azul-slot" data-cor="AZUL" data-tam="g"><div class="slot-inner"></div></td>
+                </tr>
+                <tr>
+                    <td><div class="row-label amarelo">🟡 Amarelo</div></td>
+                    <td class="slot amarelo-slot" data-cor="AMARELO" data-tam="p"><div class="slot-inner"></div></td>
+                    <td class="slot amarelo-slot" data-cor="AMARELO" data-tam="m"><div class="slot-inner"></div></td>
+                    <td class="slot amarelo-slot" data-cor="AMARELO" data-tam="g"><div class="slot-inner"></div></td>
+                </tr>
+                <tr>
+                    <td><div class="row-label rosa">🌸 Rosa</div></td>
+                    <td class="slot rosa-slot" data-cor="ROSA" data-tam="p"><div class="slot-inner"></div></td>
+                    <td class="slot rosa-slot" data-cor="ROSA" data-tam="m"><div class="slot-inner"></div></td>
+                    <td class="slot rosa-slot" data-cor="ROSA" data-tam="g"><div class="slot-inner"></div></td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn-conferir" onclick="conferir()">✅ Conferir Tudo</button>
+    </div>
+
+    <!-- BANCO -->
+    <div class="banco-container">
+        <p class="banco-titulo">🧩 Itens para organizar</p>
+        <div id="banco"></div>
+    </div>
+</main>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-emoji" id="modal-emoji">🌟</div>
+        <div class="modal-nota" id="modal-nota">NOTA 10.0</div>
+        <div class="modal-subtitulo" id="modal-sub">Você acertou 9 de 9!</div>
+        <div class="relatorio-caixa" id="relatorio-lista"></div>
+        <button class="btn-jogar-novamente" onclick="reiniciar()">🔄 Jogar Novamente</button>
+    </div>
+</div>
+
+<footer>Profª Adriana Bett Terebinto · Material Pedagógico · © 2026</footer>
+
+<script>
+    const dados = [
+        { e: "🔵", cor: "AZUL",    tam: "p", n: "Círculo Azul Pequeno" },
+        { e: "🐬", cor: "AZUL",    tam: "m", n: "Golfinho Azul Médio"  },
+        { e: "🐳", cor: "AZUL",    tam: "g", n: "Baleia Azul Grande"   },
+        { e: "🟡", cor: "AMARELO", tam: "p", n: "Círculo Amarelo Pequeno"},
+        { e: "🍌", cor: "AMARELO", tam: "m", n: "Banana Amarela Média" },
+        { e: "☀️", cor: "AMARELO", tam: "g", n: "Sol Amarelo Grande"   },
+        { e: "🌸", cor: "ROSA",    tam: "p", n: "Flor Rosa Pequena"    },
+        { e: "🦩", cor: "ROSA",    tam: "m", n: "Flamingo Rosa Médio"  },
+        { e: "💖", cor: "ROSA",    tam: "g", n: "Coração Rosa Grande"  }
+    ];
+
+    const tamLabel = { p: "P", m: "M", g: "G" }; // mantido para lógica interna
+
+    // ── Drag state (compatível com touch) ──
+    let draggingEl = null;
+    let touchOffsetX = 0, touchOffsetY = 0;
+    let ghostEl = null;
+
+    function criarItem(item) {
+        const div = document.createElement('div');
+        div.className = `item ${item.tam}`;
+        div.dataset.cor = item.cor;
+        div.dataset.tam = item.tam;
+        div.dataset.nome = item.n;
+        div.draggable = true;
+        div.innerHTML = `<span>${item.e}</span>`;
+        configurarDrag(div);
+        return div;
+    }
+
+    function criarBanco() {
+        const banco = document.getElementById('banco');
+        banco.innerHTML = '';
+        const sorteados = [...dados].sort(() => Math.random() - 0.5);
+        sorteados.forEach(item => banco.appendChild(criarItem(item)));
+    }
+
+    // ── Desktop Drag ──
+    function configurarDrag(el) {
+        el.addEventListener('dragstart', e => {
+            draggingEl = el;
+            el.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        });
+        el.addEventListener('dragend', () => {
+            el.classList.remove('dragging');
+            draggingEl = null;
+            document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
+        });
+
+        // Touch support
+        el.addEventListener('touchstart', onTouchStart, { passive: false });
+    }
+
+    document.querySelectorAll('.slot').forEach(slot => {
+        const inner = slot.querySelector('.slot-inner');
+
+        slot.addEventListener('dragover', e => {
+            e.preventDefault();
+            slot.classList.add('drag-over');
+        });
+        slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+        slot.addEventListener('drop', e => {
+            e.preventDefault();
+            slot.classList.remove('drag-over');
+            if (!draggingEl) return;
+            soltar(slot, draggingEl);
+        });
+    });
+
+    function soltar(slot, item) {
+        const inner = slot.querySelector('.slot-inner');
+        // Se tem item no slot, manda de volta pro banco
+        if (inner.children.length > 0) {
+            const antigo = inner.firstElementChild;
+            antigo.draggable = true;
+            document.getElementById('banco').appendChild(antigo);
+        }
+        inner.appendChild(item);
+        // Remove tam-tag dentro do slot (não precisa de espaço)
+        slot.classList.remove('correto', 'errado');
+        atualizarScore();
+    }
+
+    // ── Também permite clicar num slot ocupado pra devolver ──
+    document.querySelectorAll('.slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+            const inner = slot.querySelector('.slot-inner');
+            if (!draggingEl && inner.children.length > 0) {
+                const item = inner.firstElementChild;
+                document.getElementById('banco').appendChild(item);
+                slot.classList.remove('correto', 'errado');
+                atualizarScore();
+            }
+        });
+    });
+
+    // ── Touch Drag ──
+    function onTouchStart(e) {
+        const el = e.currentTarget;
+        draggingEl = el;
+        el.classList.add('dragging');
+
+        const touch = e.touches[0];
+        const rect = el.getBoundingClientRect();
+        touchOffsetX = touch.clientX - rect.left;
+        touchOffsetY = touch.clientY - rect.top;
+
+        // Cria ghost
+        ghostEl = el.cloneNode(true);
+        ghostEl.style.cssText = `
+            position:fixed; z-index:999; pointer-events:none;
+            width:${rect.width}px; height:${rect.height}px;
+            left:${rect.left}px; top:${rect.top}px;
+            opacity:0.85; transform:scale(1.15);
+            transition: none;
+        `;
+        document.body.appendChild(ghostEl);
+
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+        document.addEventListener('touchend', onTouchEnd);
+        e.preventDefault();
+    }
+
+    function onTouchMove(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        if (ghostEl) {
+            ghostEl.style.left = (touch.clientX - touchOffsetX) + 'px';
+            ghostEl.style.top  = (touch.clientY - touchOffsetY) + 'px';
+        }
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
+        const slotAbaixo = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.slot');
+        if (slotAbaixo) slotAbaixo.classList.add('drag-over');
+    }
+
+    function onTouchEnd(e) {
+        const touch = e.changedTouches[0];
+        document.removeEventListener('touchmove', onTouchMove);
+        document.removeEventListener('touchend', onTouchEnd);
+        if (ghostEl) { ghostEl.remove(); ghostEl = null; }
+        document.querySelectorAll('.slot').forEach(s => s.classList.remove('drag-over'));
+
+        if (!draggingEl) return;
+        draggingEl.classList.remove('dragging');
+
+        const slotAbaixo = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.slot');
+        if (slotAbaixo) soltar(slotAbaixo, draggingEl);
+        draggingEl = null;
+    }
+
+    // ── Score ao vivo ──
+    function atualizarScore() {
+        let acertos = 0;
+        document.querySelectorAll('.slot').forEach(slot => {
+            const inner = slot.querySelector('.slot-inner');
+            const item = inner.firstElementChild;
+            if (item && item.dataset.cor === slot.dataset.cor && item.dataset.tam === slot.dataset.tam) acertos++;
+        });
+        document.getElementById('score-badge').textContent = `⭐ ${acertos} / 9`;
+    }
+
+    // ── Conferir ──
+    function conferir() {
+        let acertos = 0;
+        let relatorioHtml = '';
+        let itensColocados = 0;
+
+        document.querySelectorAll('.slot').forEach(slot => {
+            const inner = slot.querySelector('.slot-inner');
+            const item = inner.firstElementChild;
+            if (!item) return;
+            itensColocados++;
+            const ok = item.dataset.cor === slot.dataset.cor && item.dataset.tam === slot.dataset.tam;
+            slot.classList.toggle('correto', ok);
+            slot.classList.toggle('errado', !ok);
+            if (ok) acertos++;
+            const cls = ok ? 'ok' : 'err';
+            const ico = ok ? '✅' : '❌';
+            const msg = ok ? 'No lugar certo!' : 'Lugar errado.';
+            relatorioHtml += `<div class="relatorio-item ${cls}">${ico} <b>${item.dataset.nome}</b> — ${msg}</div>`;
+        });
+
+        if (itensColocados === 0) {
+            document.getElementById('relatorio-lista').innerHTML =
+                `<div style="text-align:center;color:#F59E0B;font-weight:800;padding:10px">
+                    ⚠️ Coloque os itens na tabela primeiro!
+                 </div>`;
+            document.getElementById('modal-emoji').textContent = '😅';
+            document.getElementById('modal-nota').textContent = 'OPS!';
+            document.getElementById('modal-sub').textContent = '';
+            document.getElementById('modal-overlay').classList.add('show');
+            return;
+        }
+
+        const nota = ((acertos / dados.length) * 10).toFixed(1);
+        let emoji, cor;
+        if (acertos === dados.length)      { emoji = '🌟'; cor = '#15803D'; }
+        else if (acertos >= 7)             { emoji = '👏'; cor = '#16a34a'; }
+        else if (acertos >= 5)             { emoji = '🙂'; cor = '#D97706'; }
+        else                               { emoji = '😟'; cor = '#DC2626'; }
+
+        document.getElementById('modal-emoji').textContent = emoji;
+        document.getElementById('modal-nota').style.color = cor;
+        document.getElementById('modal-nota').textContent = `NOTA ${nota}`;
+        document.getElementById('modal-sub').textContent = `Você acertou ${acertos} de ${dados.length}!`;
+        document.getElementById('relatorio-lista').innerHTML = relatorioHtml;
+        document.getElementById('modal-overlay').classList.add('show');
+    }
+
+    function reiniciar() {
+        document.getElementById('modal-overlay').classList.remove('show');
+        document.querySelectorAll('.slot').forEach(slot => {
+            const inner = slot.querySelector('.slot-inner');
+            inner.innerHTML = '';
+            slot.classList.remove('correto', 'errado');
+        });
+        criarBanco();
+        document.getElementById('score-badge').textContent = '⭐ 0 / 9';
+    }
+
+    window.onload = criarBanco;
+</script>
+</body>
+</html>
